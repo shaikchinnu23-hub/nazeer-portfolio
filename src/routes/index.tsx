@@ -1,5 +1,6 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { motion } from "framer-motion";
+import { useState } from "react";
 import {
   Mail,
   Phone,
@@ -17,7 +18,9 @@ import {
   Sparkles,
   ExternalLink,
   MessageCircle,
+  X,
 } from "lucide-react";
+import { Dialog, DialogContent } from "@/components/ui/dialog";
 
 const Github = ({ size = 18, ...props }: { size?: number } & React.SVGProps<SVGSVGElement>) => (
   <svg viewBox="0 0 24 24" fill="currentColor" width={size} height={size} {...props}>
@@ -147,6 +150,13 @@ function SocialButtons({ size = "md" }: { size?: "sm" | "md" }) {
 }
 
 function Index() {
+  const [selectedCert, setSelectedCert] = useState<{
+    img: string;
+    t: string;
+    i: string;
+  } | null>(null);
+  const [isCertDialogOpen, setIsCertDialogOpen] = useState(false);
+
   return (
     <div className="relative min-h-screen bg-background text-foreground overflow-hidden">
       <Particles />
@@ -653,60 +663,102 @@ function Index() {
           </>
         }
       >
-        <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-5">
-          {[
-            {
-              img: certRinexCourse,
-              t: "Cyber Security & Ethical Hacking",
-              i: "Rinex — Course Completion",
-            },
-            {
-              img: certRinexAch,
-              t: "Cyber Security & Ethical Hacking",
-              i: "Rinex — Achievement (Google for Education Partner)",
-            },
-            { img: certRinexIntern, t: "Cyber Security Internship", i: "Rinex Technology · 2026" },
-            { img: certNptel, t: "Programming in Java", i: "NPTEL · IIT Kharagpur" },
-            { img: certHack, t: "RoboMelaa National Hackathon", i: "VVIT University · 2025" },
-          ].map((c, i) => (
-            <motion.a
-              key={i}
-              href={c.img}
-              target="_blank"
-              rel="noreferrer"
-              variants={fadeUp}
-              initial="hidden"
-              whileInView="show"
-              viewport={{ once: true }}
-              className="group glass rounded-2xl overflow-hidden tilt-card block"
-            >
-              <div className="aspect-[4/3] overflow-hidden bg-secondary/40">
-                <img
-                  src={c.img}
-                  alt={c.t}
-                  className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-105"
-                />
-              </div>
-              <div className="p-5">
-                <div className="flex items-start justify-between gap-3">
-                  <div>
-                    <div className="text-xs font-mono text-primary uppercase tracking-wider flex items-center gap-1.5">
-                      <Award size={12} /> Certified
-                    </div>
-                    <div className="font-semibold mt-1">{c.t}</div>
-                    <div className="text-xs text-muted-foreground mt-1">{c.i}</div>
-                  </div>
-                  <ExternalLink
-                    size={14}
-                    className="text-muted-foreground group-hover:text-primary transition-colors"
+        <Dialog open={isCertDialogOpen} onOpenChange={(open) => {
+          if (!open) {
+            setSelectedCert(null);
+          }
+          setIsCertDialogOpen(open);
+        }}>
+          <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-5">
+            {[
+              {
+                img: certRinexCourse,
+                t: "Cyber Security & Ethical Hacking",
+                i: "Rinex — Course Completion",
+              },
+              {
+                img: certRinexAch,
+                t: "Cyber Security & Ethical Hacking",
+                i: "Rinex — Achievement (Google for Education Partner)",
+              },
+              { img: certRinexIntern, t: "Cyber Security Internship", i: "Rinex Technology · 2026" },
+              { img: certNptel, t: "Programming in Java", i: "NPTEL · IIT Kharagpur" },
+              { img: certHack, t: "RoboMelaa National Hackathon", i: "VVIT University · 2025" },
+            ].map((c, i) => (
+              <motion.button
+                key={i}
+                type="button"
+                onClick={() => {
+                  setSelectedCert(c);
+                  setIsCertDialogOpen(true);
+                }}
+                variants={fadeUp}
+                initial="hidden"
+                whileInView="show"
+                viewport={{ once: true }}
+                className="group glass rounded-[2rem] overflow-hidden tilt-card block text-left h-full shadow-xl shadow-black/10 border border-white/10"
+              >
+                <div className="h-64 sm:h-72 overflow-hidden bg-secondary/20 grid place-items-center">
+                  <img
+                    src={c.img}
+                    alt={c.t}
+                    className="max-h-full max-w-full object-contain transition-transform duration-700 group-hover:scale-105"
                   />
                 </div>
-              </div>
-            </motion.a>
-          ))}
+                <div className="p-5">
+                  <div className="flex items-start justify-between gap-3">
+                    <div>
+                      <div className="text-xs font-mono text-primary uppercase tracking-wider flex items-center gap-1.5">
+                        <Award size={12} /> Certified
+                      </div>
+                      <div className="font-semibold mt-1">{c.t}</div>
+                      <div className="text-xs text-muted-foreground mt-1">{c.i}</div>
+                    </div>
+                    <ExternalLink
+                      size={14}
+                      className="text-muted-foreground group-hover:text-primary transition-colors"
+                    />
+                  </div>
+                </div>
+              </motion.button>
+            ))}
+          </div>
 
-        
-        </div>
+          {selectedCert ? (
+            <motion.div
+              initial={{ x: 600, opacity: 0 }}
+              animate={{ x: 0, opacity: 1 }}
+              exit={{ x: 600, opacity: 0 }}
+              transition={{ type: "spring", stiffness: 300, damping: 30 }}
+              className="fixed right-0 top-0 z-50 h-full w-full sm:w-auto backdrop-blur-3xl"
+            >
+              <DialogContent className="fixed right-0 top-0 w-full sm:max-w-2xl h-full max-h-none left-auto translate-x-0 translate-y-0 rounded-none sm:rounded-[2.5rem] p-0 bg-white/10 border-l border-white/10 shadow-2xl shadow-cyan-500/10 overflow-y-auto">
+                <button
+                  onClick={() => setIsCertDialogOpen(false)}
+                  className="absolute left-6 top-6 z-50 h-10 w-10 rounded-full bg-white/10 border border-white/10 grid place-items-center hover:bg-white/20 transition-colors text-white/70 hover:text-white"
+                >
+                  <X size={20} />
+                </button>
+                <div className="relative bg-gradient-to-br from-[#070b14] to-[#0a0f1a] px-6 py-6 min-h-screen flex flex-col justify-between">
+                  <div className="absolute inset-0 bg-gradient-to-br from-cyan-500/10 via-transparent to-violet-500/10 pointer-events-none" />
+                  <div className="relative space-y-8">
+                    <div className="pt-12 flex items-center justify-center min-h-[60vh]">
+                      <img
+                        src={selectedCert.img}
+                        alt={selectedCert.t}
+                        className="max-h-[70vh] max-w-full object-contain rounded-[2rem] shadow-2xl shadow-black/40 bg-black"
+                      />
+                    </div>
+                    <div className="rounded-[2rem] bg-white/10 border border-white/10 p-6 backdrop-blur-xl text-white shadow-lg shadow-black/20 mx-4 sm:mx-0">
+                      <div className="text-lg font-semibold tracking-tight">{selectedCert.t}</div>
+                      <div className="text-sm text-slate-200 mt-2">{selectedCert.i}</div>
+                    </div>
+                  </div>
+                </div>
+              </DialogContent>
+            </motion.div>
+          ) : null}
+        </Dialog>
 
         {/* Hobbies */}
         <div className="mt-12 grid md:grid-cols-2 gap-6">
