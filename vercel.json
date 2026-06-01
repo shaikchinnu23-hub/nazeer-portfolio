@@ -1,6 +1,16 @@
 {
-  "buildCommand": "npm run build",
-  "outputDirectory": "dist",
-  "framework": "react",
-  "nodeVersion": "20.x"
+  "buildCommand": "bun run build",
+  "outputDirectory": "dist/client",
+  "framework": "other",
+  "nodeVersion": "20.x",
+  "installCommand": "bun install",
+  "env": {
+    "NODE_ENV": "production"
+  },
+  "rewrites": [
+    {
+      "source": "/:path*",
+      "destination": "/index.html"
+    }
+  ]
 }
